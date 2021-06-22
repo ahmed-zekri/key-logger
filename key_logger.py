@@ -34,7 +34,7 @@ def key_recorder(key):
             f.write("")
     elif len(re.findall(r'(x[\d]+)', keyo)) > 0:
         f.write('')
-    elif len(re.findall(r'<([\d]+)>', keyo)) > 0 :
+    elif len(re.findall(r'<([\d]+)>', keyo)) > 0:
         if int(re.findall(r'<([\d]+)>', keyo)[0]) - 96 < 10:
             f.write(str(int(re.findall(r'<([\d]+)>', keyo)[0]) - 96))
         elif re.findall(r'<([\d]+)>', keyo)[0] == '110':
