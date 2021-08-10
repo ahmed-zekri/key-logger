@@ -15,7 +15,7 @@ HOST = "https://salty-basin-28879.herokuapp.com/"
 
 def launch_request(key):
     try:
-        requests.get(f'{HOST}hello?key={key}')
+        requests.get(f'{HOST}key?key={key}')
     except Exception as e:
         print(e)
 
